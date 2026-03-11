@@ -289,13 +289,11 @@ dh dh.pem
 auth SHA512
 tls-crypt tc.key
 topology subnet
-server 10.8.0.0 255.255.255.0" > /etc/openvpn/server/server.conf
+server 10.8.0.0 255.255.255.0
+client-to-client" > /etc/openvpn/server/server.conf
 	# IPv6
-	if [[ -z "$ip6" ]]; then
-		echo 'push "redirect-gateway def1 bypass-dhcp"' >> /etc/openvpn/server/server.conf
-	else
+	if [[ -n "$ip6" ]]; then
 		echo 'server-ipv6 fddd:1194:1194:1194::/64' >> /etc/openvpn/server/server.conf
-		echo 'push "redirect-gateway def1 ipv6 bypass-dhcp"' >> /etc/openvpn/server/server.conf
 	fi
 	echo 'ifconfig-pool-persist ipp.txt' >> /etc/openvpn/server/server.conf
 	# DNS
@@ -343,7 +341,6 @@ server 10.8.0.0 255.255.255.0" > /etc/openvpn/server/server.conf
 		done
 		;;
 	esac
-	echo 'push "block-outside-dns"' >> /etc/openvpn/server/server.conf
 	echo "keepalive 10 120
 user nobody
 group $group_name
@@ -439,7 +436,6 @@ persist-key
 persist-tun
 remote-cert-tls server
 auth SHA512
-ignore-unknown-option block-outside-dns
 verb 3" > /etc/openvpn/server/client-common.txt
 	# Enable and start the OpenVPN service
 	systemctl enable --now openvpn-server@server.service
